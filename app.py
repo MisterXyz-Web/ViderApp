@@ -1,3 +1,6 @@
+import eventlet
+eventlet.monkey_patch()
+
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from flask_socketio import SocketIO, emit
 import sqlite3
@@ -18,7 +21,7 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 active_users = {}
 
 # Timeout user dalam 30 detik jika tidak ada aktivitas
-USER_TIMEOUT = 1
+USER_TIMEOUT = 30
 
 def get_db():
     """Membuka koneksi ke database SQLite"""
@@ -264,4 +267,4 @@ socketio.start_background_task(remove_inactive_users)
 if __name__ == '__main__':
     if not os.path.exists(DATABASE):
         init_db()
-    socketio.run(app, debug=True, host='0.0.0.0', port=5000)
+    socketio.run(app, debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
